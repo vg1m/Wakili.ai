@@ -31,10 +31,10 @@ additional_mods = ['numpy.core._methods', 'numpy.lib.format']
 additional_packages = ['asyncio', 'asyncio.compat', 'appdirs', 'csv', 'pkg_resources._vendor', 'tkinter']
 
 setup(
-    name = "Desktop Professional Support Lawyer",
+    name = "Command Line Law Clerk.",
     version = "1.0.1",
-    description = 'Desktop Professional Support Lawyer.',
-    author = 'Wakili.AI',
+    description = 'Command Line Law Clerk.',
+    author = 'Wakili.ai',
     author_email = 'hello@nomeon.technology',
     options = {
         'build_exe': {

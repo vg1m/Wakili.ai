@@ -1,7 +1,3 @@
-#Understand the target audience;Understand the natural language in which communication happens; 
-#Understand the intent of the user;
-#Come up with responses that can answer the user and give further clues
-
 from bs4 import BeautifulSoup
 import pdb
 import requests
@@ -30,7 +26,7 @@ from datetime import datetime, date
 now = datetime.now()
 toaster = ToastNotifier()
 
-print("LegiBot [Version 1.0.2] | © 2019 All rights reserved |", date.today())
+print("LegiBot [Version 1.0.1] | © 2019 All rights reserved |", date.today())
 toaster.show_toast("Launching LegiBot",
                             "Your AI Lawyer. ",
                             icon_path="scrapercon.ico",
@@ -189,7 +185,7 @@ def main():
         options.add_argument('--test-type')
         os.environ["webdriver.chrome.driver"] = chromedriver
         driver = webdriver.Chrome(chrome_options=options, executable_path= chromedriver)
-        hansard_url = "https://books.google.co.ke/books/about/Kenya_National_Assembly_Official_Record.html?id=pvwVH2fQKWQC&hl=sw"
+        hansard_url = "http://books.google.co.ke/books/about/Kenya_National_Assembly_Official_Record.html?id=pvwVH2fQKWQC"
         driver.get(hansard_url)
         searchbox = driver.find_element_by_id("search_form_input")
         searchbox.send_keys(year)
@@ -281,12 +277,9 @@ def main():
         main()
      
     if user=="4":
-        #If day of the week is Friday, and time is 2 pm, download the Kenya Gazette.
-    # If you want hours and minutes, add > if now.hour == 14 and now.minute == 12
-        from datetime import datetime, date
-        now = datetime.now()
-        if date.today().weekday()== 4:
-            wkg = ["http://kenyalaw.org/kenya_gazette/"]
+        kgsearch=input("1. Current Issue.\n2. Recent Issues\n3. Archives (prior to 2005)\n\nPick: ")
+        if kgsearch=="1":
+            print("Fetching latest  issue...")
             for urls in wkg:
                 response = requests.get(urls)
                 soup = BeautifulSoup(response.content, "lxml")
@@ -297,7 +290,72 @@ def main():
                     toaster.show_toast("Kenya Gazette Download complete ",
                                                 "Check folder... ",
                                                 icon_path="scrapercon.ico",
-                                                duration=5)
+                                               duration=5)
+        if kgsearch=="2":
+            chromedriver =  "./chromedriver.exe"
+            options = Options()
+            options.accept_untrusted_certs = True
+            options.assume_untrusted_cert_issuer = True
+            options.add_argument('disable-infobars')
+            options.add_argument("--no-sandbox")
+            options.add_argument("--allow-http-screen-capture")
+            options.add_argument("--disable-impl-side-painting")
+            options.add_argument("--disable-setuid-sandbox")
+            options.add_argument("--disable-seccomp-filter-sandbox")
+            options.add_argument("--disable-extensions")
+            options.add_argument('--ignore-gpu-blacklist')
+            options.add_argument('--no-default-browser-check')
+            options.add_argument('--no-first-run')
+            options.add_argument('--disable-default-apps')
+            options.add_argument('--disable-infobars')
+            options.add_argument('--disable-extensions')
+            options.add_argument('--test-type')
+            os.environ["webdriver.chrome.driver"] = chromedriver
+            driver = webdriver.Chrome(chrome_options=options, executable_path= chromedriver)
+            ArchivedGazette_url = "http://kenyalaw.org/kenya_gazette/"
+            driver.get(ArchivedGazette_url)
+            
+        if kgsearch=="3":
+            year=input("Year: ")
+            context_=input("Context: ")
+            print("\n")
+            print("Researching...")
+            toaster.show_toast("Analysing your input against archive. ",
+                                        "Please wait until results show. ",
+                                        icon_path="scrapercon.ico",
+                                        duration=5)
+            chromedriver =  "./chromedriver.exe"
+            options = Options()
+            options.accept_untrusted_certs = True
+            options.assume_untrusted_cert_issuer = True
+            options.add_argument('disable-infobars')
+            options.add_argument("--no-sandbox")
+            options.add_argument("--allow-http-screen-capture")
+            options.add_argument("--disable-impl-side-painting")
+            options.add_argument("--disable-setuid-sandbox")
+            options.add_argument("--disable-seccomp-filter-sandbox")
+            options.add_argument("--disable-extensions")
+            options.add_argument('--ignore-gpu-blacklist')
+            options.add_argument('--no-default-browser-check')
+            options.add_argument('--no-first-run')
+            options.add_argument('--disable-default-apps')
+            options.add_argument('--disable-infobars')
+            options.add_argument('--disable-extensions')
+            options.add_argument('--test-type')
+            os.environ["webdriver.chrome.driver"] = chromedriver
+            driver = webdriver.Chrome(chrome_options=options, executable_path= chromedriver)
+            hansard_url = "https://books.google.co.ke/books/about/Kenya_Gazette.html?id=SiZddRcP0BcC"
+            driver.get(hansard_url)
+            searchbox = driver.find_element_by_id("search_form_input")
+            searchbox.send_keys(year, "\t", context_)
+            print("\n")
+            print("Continue researching from the browser. Once done, please close it.")
+            print("\n")
+            
+        else:
+            print("\n")
+            print("For recent issues, go to http://kenyalaw.org/kenya_gazette/. ")
+            print("\n")
             print(User_Name, "'s", "LegiBot Activity Summary: ")
             print("> Researcher: ", User_Name)
             print("> Query: Kenya Gazette ")
@@ -305,12 +363,8 @@ def main():
             print("\n")
             if __name__ == "__main__":
                 main()
-        else:
-            print("\n")
-            print("For the latest issue please check this coming Friday as from 12 PM. For past issues, go to http://kenyalaw.org/kenya_gazette/. ")
-            print("\n")
-            if __name__ == "__main__":
-                main()
+        if __name__ == "__main__":
+            main()
                 
     
     if user=="3":
