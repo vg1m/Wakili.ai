@@ -1,5 +1,4 @@
 from bs4 import BeautifulSoup
-import pdb
 import requests
 from parse import *
 import re
@@ -22,11 +21,10 @@ import time
 from time import sleep
 from datetime import datetime, date
 
-
 now = datetime.now()
 toaster = ToastNotifier()
 
-print("LegiBot [Version 1.0.1] | © 2019 All rights reserved |", date.today())
+print("LegiBot [Version 1.2] | QuickBot Enterprises | © 2019 All rights reserved |", date.today())
 toaster.show_toast("Launching LegiBot",
                             "Your AI Lawyer. ",
                             icon_path="scrapercon.ico",
@@ -60,7 +58,7 @@ elif now.hour==17 or now.hour == 18 or now.hour == 19 or now.hour == 20 or now.h
 #Prompt user action
 def main():
     print ("Pick an activity:- \n")
-    print("1. Legislation.\n2. Legal Terms.\n3. Cases.\n4. Gazette Notices.\n5. Hansards.\n6. Cause lists ")
+    print("1. Legislation (BETA).\n2. Legal Terms.\n3. Cases.\n4. Gazette Notices.\n5. Hansards.\n6. Cause lists ")
     print("\n")
     user=input("Activity: ")
     print("\n")
@@ -280,17 +278,20 @@ def main():
         kgsearch=input("1. Current Issue.\n2. Recent Issues\n3. Archives (prior to 2005)\n\nPick: ")
         if kgsearch=="1":
             print("Fetching latest  issue...")
-            for urls in wkg:
-                response = requests.get(urls)
+            current="http://kenyalaw.org/kenya_gazette/gazette"
+            for urls in current:
+                response = requests.get(current)
                 soup = BeautifulSoup(response.content, "lxml")
                 for link in soup.findAll('a', attrs={'href': re.compile("^http://kenyalaw.org/kenya_gazette/gazette/download/")}):
                     Kenya_Gazette = link.get('href')
                     r = requests.get(Kenya_Gazette, allow_redirects=True)
-                    open('Kenya Gazette.pdf', 'wb').write(r.content)
+                    open('KenyaGazette.pdf', 'wb').write(r.content)
                     toaster.show_toast("Kenya Gazette Download complete ",
                                                 "Check folder... ",
                                                 icon_path="scrapercon.ico",
                                                duration=5)
+                    main()
+                    print("\n")
         if kgsearch=="2":
             chromedriver =  "./chromedriver.exe"
             options = Options()
@@ -348,6 +349,7 @@ def main():
             driver.get(hansard_url)
             searchbox = driver.find_element_by_id("search_form_input")
             searchbox.send_keys(year, "\t", context_)
+            searchbox.send_keys("\n")
             print("\n")
             print("Continue researching from the browser. Once done, please close it.")
             print("\n")
@@ -370,8 +372,6 @@ def main():
     if user=="3":
         import time
         from datetime import datetime, date
-        
-        
         print("Starting case search..")
         print("\n")
         txt=input("1.) Which Law would you like cases on?  ")
@@ -2655,29 +2655,17 @@ def main():
             Amending_Acts=soup.find("div", attrs={"id":"longTitle_1_V2_t2"})
             print(Amending_Acts.text)
 
-            print("\n")
             time = soup.find("select", id="cboPIT")
             print("Amendment History")
             print(time.text)
             
-            FinanceBill18=input("Would you like to view an analysis of the Finance Bill 2018? [y/n] ").lower()
-            if FinanceBill18=="yes" or FinanceBill18=="y":
-                FinanceBill18="https://home.kpmg.com/content/dam/kpmg/ke/pdf/tax/Finance%20Bill%202018%20Analysis.pdf"
-                r = requests.get(FinanceBill18, allow_redirects=True)
-                FinanceBill18= "Downloading analysis of the Finance Bill 2018 as *Finance Bill 2018-KPMG Analysis*."
-                list=textwrap3.wrap(FinanceBill18, width=90)
-                for element in list:
-                    print(element)
-                print("----Download complete----.")
-            print("************************************************************")
-            print("\n")
-            open('Finance Bill 2018-KPMG Analysis.pdf', 'wb').write(r.content)
-                
+                           
             Download= "http://www.kenyalaw.org/lex/rest//db/kenyalex/Kenya/Legislation/English/Acts%20and%20Regulations/V/Value%20Added%20Tax%20Act%20No.%2035%20of%202013/docs/ValueAddedTax_ActNo35of2013.pdf"
             r = requests.get(Download, allow_redirects=True)
-            print("\n")
-            print("I downloaded a copy of the VAT Act just in case. .")
-            print("\n")
+            toaster.show_toast("Downloaded Online Version ",
+                                        " ",
+                                        icon_path="scrapercon.ico",
+                                        duration=5)
             open('Value Added Tax .pdf', 'wb').write(r.content)
 
             Download1=input ("Do you need the VAT subsidiary legislation? [y/n] ").lower()
@@ -2688,11 +2676,14 @@ def main():
                 list=textwrap3.wrap(Download1, width=90)
                 for element in list:
                     print(element)
-                print("----Download complete----.")
+                toaster.show_toast("Downloads complete, check folder.",
+                                        " ",
+                                        icon_path="scrapercon.ico",
+                                        duration=5)
                 open('VAT Regulations.pdf', 'wb').write(r.content)
           
     ###
-        if actTitle=="Tax Appeals Tribunal" or actTitle=="tax appeals tribunal" or actTitle=="tax appeals" or actTitle=="Tax Appeals":
+        if actTitle=="Tax Appeals Tribunal" or actTitle== "TAT" or actTitle=="tax appeals tribunal" or actTitle=="tax appeals" or actTitle=="Tax Appeals":
             
             actTitle1= ["http://www.kenyalaw.org/lex//actview.xql?actid=No.%2040%20of%202013"]
 
@@ -2705,26 +2696,25 @@ def main():
             for title in title:
                 print(title.string)
 
-            commencement=soup.find_all("div", class_="act-commencement")
-            for commencement in commencement:
-                print(commencement.text)
-            print("\n")
-            #time = soup.find("select", id="cboPIT")
-            #print("Amendment History")
-            #print(time.text)  
-            print(User_Name, ", this is the time stamp of the legislation that matches your keyword: ")
-            tat2= "Statute quarantined "
-            list=textwrap3.wrap(tat2, width=95)
-            for element in list:
-                print(element)
+            quote_page = "http://www.kenyalaw.org/lex//actview.xql?actid=No.%2040%20of%202013"
+            page = urllib.request.urlopen(quote_page)
+            soup = BeautifulSoup(page, "lxml")
+            Amending_Acts=soup.find("div", attrs={"id":"longTitle_1_V6_t6"})
+            print(Amending_Acts.text)
+            
+            time = soup.find("select", id="cboPIT")
+            print("Amendment History")
+            print(time.text)  
 
             Download= "http://www.kenyalaw.org/lex/rest//db/kenyalex/Kenya/Legislation/English/Acts%20and%20Regulations/T/Tax%20Appeals%20Tribunal%20Act%20-%20No.%2040%20of%202013/docs/TaxAppealsTribunalActNo.40of2013.pdf"
             r = requests.get(Download, allow_redirects=True)
-            print("\n")
-            print("-----Downloaded Online Version-----.")
-            print("\n")
+            toaster.show_toast("Downloads complete, check folder.",
+                                        " ",
+                                        icon_path="scrapercon.ico",
+                                        duration=5)
             
             open('Tax Appeals Tribunal .pdf', 'wb').write(r.content)
+            print("For tribunal decisions, visit this link http://kenyalaw.org/kl/index.php?id=8380")    
 
     ###
         if actTitle=="Excise Duty" or actTitle=="excise duty" or actTitle=="excise" or actTitle=="excise tax":
@@ -2760,7 +2750,7 @@ def main():
             print("\n")
             open('Excise Duty .pdf', 'wb').write(r.content)
 
-            print("************************************************************")
+            print("-"*35)
             print("\n")
             FinanceBill18=input("Would you like to view an analysis of the Finance Bill 2018? [y/n] ").lower()
             if FinanceBill18=="yes" or FinanceBill18=="y":
@@ -2771,7 +2761,7 @@ def main():
                 for element in list:
                     print(element)
                 print("----Download complete----.")
-            print("************************************************************")
+            print("-"*35)
             print("\n")
             open('Finance Bill 2018-KPMG Analysis.pdf', 'wb').write(r.content)
 
@@ -2809,7 +2799,7 @@ def main():
             print("\n")
             open('Tax Procedures .pdf', 'wb').write(r.content)
 
-            print("************************************************************")
+            print("-"*35)
             print("\n")
             FinanceBill18=input("Would you like to view an analysis of the Finance Bill 2018? [y/n] ").lower()
             if FinanceBill18=="yes" or FinanceBill18=="y":
@@ -2820,7 +2810,7 @@ def main():
                 for element in list:
                     print(element)
                 print("----Download complete----.")
-            print("************************************************************")
+            print("-"*35)
             print("\n")
             open('Finance Bill 2018-KPMG Analysis.pdf', 'wb').write(r.content)
 
@@ -5798,12 +5788,12 @@ def main():
                 import csv
                 with open("Legislation_Search_Activity.csv", "a", encoding="utf-8") as csv_file:
                     writer = csv.writer(csv_file)
-                    writer.writerow(["Date", "Researcher", "Legislation", "Summary"])
+                    writer.writerow(["Date", "Researcher", "Legislation"])
                     Date=date.today()
                     Researcher=User_Name
                     Legislation=actTitle
-                    Summary=Amending_Acts.text
-                    writer.writerow([Date, Researcher, Legislation, Summary])
+                    #Summary=Amending_Acts.text
+                    writer.writerow([Date, Researcher, Legislation])
      
 #DEPENDING ON USER INPUT, CODE WILL EITHER END OR RESTART HERE
 print("\n")
